@@ -68,7 +68,15 @@ func (f *FilterConfig) Event(ctx context.Context, event logevent.LogEvent) (loge
 		event.SetValue(f.Split[0], strings.Split(event.GetString(f.Split[0]), f.Split[1]))
 	}
 	if f.Replace[0] != "" {
-		event.SetValue(f.Replace[0], strings.Replace(event.GetString(f.Replace[0]), f.Replace[1], f.Replace[2], -1))
+		oldVal := f.Replace[1]
+		newVal := f.Replace[2]
+		if strings.HasPrefix(oldVal, "%{") {
+			oldVal = event.Format(oldVal)
+		}
+		if strings.HasPrefix(newVal, "%{") {
+			newVal = event.Format(newVal)
+		}
+		event.SetValue(f.Replace[0], strings.Replace(event.GetString(f.Replace[0]), oldVal, newVal, -1))
 	}
 	if f.Merge[0] != "" {
 		event = mergeField(event, f.Merge[0], f.Merge[1])
