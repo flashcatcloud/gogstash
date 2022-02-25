@@ -238,15 +238,15 @@ func (t *InputConfig) fileReadLoop(
 		if err == nil {
 			since.Offset += int64(size)
 
-			//loggfer.Debugf("%q %v", event.Message, event)
-			//msgChan <- event
+			// loggfer.Debugf("%q %v", event.Message, event)
+			// msgChan <- event
 
-			//self.SaveSinceDBInfos()
+			// self.SaveSinceDBInfos()
 			if err = t.CheckSaveSinceDBInfos(); err != nil {
 				return err
 			}
 		} else {
-			logger.Errorf("Failed to decode %v using codec %v", line, t.Codec)
+			logger.Errorf("Failed to decode %v using codec %v error %s", line, t.Codec, err)
 		}
 	}
 }

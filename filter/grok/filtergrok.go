@@ -108,7 +108,7 @@ func (f *FilterConfig) Event(ctx context.Context, event logevent.LogEvent) (loge
 
 	if !found {
 		event.AddTag(ErrorTag)
-		goglog.Logger.Debugf("grok: no matches for %q", message)
+		goglog.Logger.Debugf("grok: no matches for %q, filter %q %v", message, f.Match, event)
 		return event, false
 	}
 
