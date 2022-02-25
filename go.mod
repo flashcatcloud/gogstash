@@ -6,7 +6,7 @@ require (
 	github.com/Knetic/govaluate v3.0.0+incompatible
 	github.com/Microsoft/go-winio v0.5.1 // indirect
 	github.com/Microsoft/hcsshim v0.9.0 // indirect
-	github.com/Shopify/sarama v1.26.1
+	github.com/Shopify/sarama v1.31.1
 	github.com/alicebob/gopher-json v0.0.0-20180125190556-5a6b3ba71ee6 // indirect
 	github.com/alicebob/miniredis v2.5.0+incompatible
 	github.com/bitly/go-hostpool v0.1.0
@@ -35,9 +35,7 @@ require (
 	github.com/nsqio/go-nsq v1.0.8
 	github.com/olivere/elastic/v7 v7.0.14
 	github.com/oschwald/geoip2-golang v1.4.0
-	github.com/pierrec/lz4 v2.5.1+incompatible // indirect
 	github.com/prometheus/client_golang v1.11.0
-	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/satyrius/gonx v1.3.1-0.20181123214749-d96bd26e3b2c
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cast v1.3.1 // indirect

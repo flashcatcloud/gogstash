@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/Shopify/sarama"
 	"github.com/tsaikd/gogstash/config"
@@ -72,6 +73,9 @@ func InitHandler(
 	 */
 	sarConfig := sarama.NewConfig()
 	sarConfig.Version = version
+	sarConfig.ClientID = "gogstash"
+	sarConfig.Consumer.MaxProcessingTime = 10000 * time.Millisecond
+	sarConfig.Consumer.Fetch.Default = 10 * 1024 * 1024
 
 	switch conf.Assignor {
 	case "roundrobin":
@@ -205,7 +209,7 @@ func (c *consumerHandle) ConsumeClaim(session sarama.ConsumerGroupSession, claim
 	// The `ConsumeClaim` itself is called within a goroutine, see:
 	// https://github.com/Shopify/sarama/blob/master/consumer_group.go#L27-L29
 	for message := range claim.Messages() {
-		//goglog.Logger.Printf("Message claimed: value = %s, timestamp = %v, topic = %s", string(message.Value), message.Timestamp, message.Topic)
+		// goglog.Logger.Printf("Message claimed: value = %s, timestamp = %v, topic = %s", string(message.Value), message.Timestamp, message.Topic)
 		var extra = map[string]interface{}{
 			"topic":     message.Topic,
 			"timestamp": message.Timestamp,
