@@ -32,6 +32,9 @@ type OutputConfig struct {
 	Password        string   `json:"password"`          // basic auth password to Elasticsearch
 	SimpleClient    bool     `json:"simple_client"`     // if set uses simpleclient instead of newclient, disables some functionality
 
+	TimestampIndexField  string `json:"timestamp_index_field"`  // which field use to index
+	TimestampIndexFormat string `json:"timestamp_index_format"` // the field's time format
+
 	Sniff bool `json:"sniff"` // find all nodes of your cluster, https://github.com/olivere/elastic/wiki/Sniffing
 
 	// BulkActions specifies when to flush based on the number of actions
@@ -193,9 +196,34 @@ func (t *OutputConfig) BulkAfter(executionID int64, requests []elastic.BulkableR
 
 // Output event
 func (t *OutputConfig) Output(ctx context.Context, event logevent.LogEvent) (err error) {
-	index := event.Format(t.Index)
+	index := t.Index
+	// time_format eg. "2006-01-02T15:04:05.999Z"
+	if t.TimestampIndexField != "" && t.TimestampIndexFormat != "" {
+		if v, ok := event.GetValue(t.TimestampIndexField); ok {
+			switch vv := v.(type) {
+			case string:
+				if eventTime, err := time.Parse(t.TimestampIndexFormat, vv); err == nil {
+					index = logevent.FormatWithEventTime(t.Index, eventTime)
+					goglog.Logger.Debugf("prepare to create elastic index %s with time field %s, format %s and eventtime %s",
+						index, t.TimestampIndexField, t.TimestampIndexFormat, eventTime)
+				} else {
+					goglog.Logger.Errorf("timestamp index field %s has an invalid parse format %s, "+
+						"field value %s with parse error %s",
+						t.TimestampIndexField, t.TimestampIndexFormat, v, err)
+				}
+			case time.Time:
+				index = vv.Format(t.TimestampIndexFormat)
+			default:
+				goglog.Logger.Warnf("type of field %s is invalid", t.TimestampIndexField, event.Extra)
+			}
+		} else {
+			goglog.Logger.Warnf("event get %s value failed %+v", t.TimestampIndexField, event.Extra)
+		}
+	}
+	index = event.Format(index)
 	// elastic index name should be lowercase
 	index = strings.ToLower(index)
+	goglog.Logger.Debugf("create elastic index %s", index)
 	id := event.Format(t.DocumentID)
 
 	indexRequest := elastic.NewBulkIndexRequest().
